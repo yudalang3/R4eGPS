@@ -1,0 +1,20 @@
+Package: R4eGPS
+Type: Package
+Title: The R packege for the eGPS
+Version: 0.1.3
+Author: Dalang Yu
+Maintainer: Dalang Yu <yudalang@ucas.edu.cn>
+Description: The R wrapper of eGPS software.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    rJava
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.3.2
+Imports: 
+    jsonlite,
+    rlang

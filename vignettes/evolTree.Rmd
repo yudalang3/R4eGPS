@@ -1,0 +1,30 @@
+---
+title: "How to use the evolTree operation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to use the evolTree operation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# The setup when you use the R4eGPS
+
+When you use for the first time, please set the configuration. The first important one is the eGPS_jars_path variable like `"C:/Users/yudal/Documents/project/eGPS2/eGPS_v2_windows_64bit/eGPS_lib"`.
+
+```{r setup}
+# You need to set the location of the eGPS jar files
+# R4eGPS::setGlobalVars( list( eGPS_jars_path = '/your/path/file.txt') )
+library(R4eGPS)
+```
+
+
+# Quick function with the eGPS libraries
+
+
