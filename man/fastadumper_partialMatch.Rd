@@ -28,3 +28,6 @@ Run example
 # entry = c("gene1","gene2","gene2"))
 # fastadumper_partialMatch(fastaPath = "subject.fa",entries = entry, outPath = "out.fa")
 }
+\details{
+Note: the fasta file must be ContinuousFasta.
+}

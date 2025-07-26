@@ -17,7 +17,7 @@ eGPS_software_path_key <- 'eGPS_software_path'
       "-Dfile.encoding=UTF-8",
       "-Dstdout.encoding=UTF-8",
       "-Dstderr.encoding=UTF-8" ,
-      "-Xmx2g"
+      "-Xmx4g"
     )
   )
 

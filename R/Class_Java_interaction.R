@@ -22,13 +22,14 @@ launchEGPS_withinR <- function(programPath = NA_character_) {
   }
   setLib_and_launchJVM()
 
-  launchClass <- "egps2.RlangInferfaceEGPS"
+  launchClass <- "module.RlangInterfaceEGPS"
   tryCatch(
     expr = {
       instance <- .jnew(launchClass)
       words <- .jcall(obj = instance,
                       returnSig = "S",
                       method = "launch")
+      print(words);
     },
     error = getErrorFun()
   )
@@ -39,7 +40,7 @@ launchEGPS_withinR <- function(programPath = NA_character_) {
 }
 
 
-#' Set libray and launch JVM
+#' Set library and launch JVM
 #'
 #' @return the lib paths
 #' @export

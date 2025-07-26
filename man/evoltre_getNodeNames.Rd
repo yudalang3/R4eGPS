@@ -4,12 +4,21 @@
 \alias{evoltre_getNodeNames}
 \title{With importing the tree_path and the onlyLeaf parameters, return the names array.}
 \usage{
-evoltre_getNodeNames(tree_path, onlyLeaf = FALSE)
+evoltre_getNodeNames(
+  tree_path,
+  targetHTU = NULL,
+  getOTU = TRUE,
+  getHTU = FALSE
+)
 }
 \arguments{
 \item{tree_path}{The phylogenetic tree path}
 
-\item{onlyLeaf}{only leaf names or the total names (including internal nodes)}
+\item{targetHTU}{NULL for the root node, else input the internal node name}
+
+\item{getOTU}{whether get the OTU names}
+
+\item{getHTU}{whether get the HTU names}
 }
 \value{
 the string vecotr of names.
@@ -19,7 +28,10 @@ With importing the tree_path and the onlyLeaf parameters, return the names array
 }
 \examples{
 \dontrun{
-evoltre_getNodeNames('path/to/tree.nwk' ,  onlyLeaf = F);
+## get the leaf names:
+evoltre_getNodeNames('path/to/tree.nwk' ,  getOTU = T, getHTU = F);
+## get the leaf names of certain internal node
+evoltre_getNodeNames('path/to/tree.nwk' , targetHTU = 'name1', getOTU = T, getHTU = F);
 }
 
 }

@@ -13,7 +13,7 @@ hmmer_domtbl2tsv <- function(hmmerDomtbl, outputPath) {
   }
   initializeJVM4eGPS()
 
-  launchClass <- "egps2.module.homoidentify.totsv.API4R"
+  launchClass <- "module.homoidentify.totsv.API4R"
   tryCatch(
     expr ={
       instance <- rJava::.jnew(launchClass)

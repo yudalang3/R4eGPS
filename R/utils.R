@@ -53,7 +53,7 @@ initializeJVM4eGPS <- function() {
 #'
 runTest <- function() {
   initializeJVM4eGPS();
-  launchClass <- "egps2.module.fastadumper.extractpartial.API4R"
+  launchClass <- "module.fastadumper.extractpartial.API4R"
   instance <- rJava::.jnew(launchClass)
   rJava::.jcall(instance, "V", "test4type",letters, 1:10)
 }

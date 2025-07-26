@@ -1,5 +1,27 @@
+#### Test if the rJava package is OK
+
+.jcall("java/lang/System", "S", "getProperty", "java.version")
+.jcall("java/lang/System", "S", "getProperty", "java.home")
+# .jinit()
+
+launchClass <- "module.RlangInterfaceEGPS"
+tryCatch(
+  expr = {
+    instance <- .jnew(launchClass)
+    words <- .jcall(obj = instance,
+                    returnSig = "S",
+                    method = "launch")
+    print(words);
+  },
+  error = getErrorFun()
+)
+
+
+#### Test if package information is OK
+
 library(R4eGPS)
-egps <- R4eGPS::launchEGPS_withinR("C:/Users/yudal/Documents/project/eGPS2/eGPSv2_forMyselfUsage")
+egps <- R4eGPS::launchEGPS_withinR("C:/Users/yudal/Documents/project/eGPS2/eGPS_v2_for_self_test")
+
 
 compsLength <- 10
 sampleSize <- 8
@@ -28,21 +50,16 @@ keepSearch <-  F
 
 
 R4eGPS::fastadumper_partialMatch(fastaPath,entries,outPath,keepSearch)
+
+# extract_sequence
+fastaPath <- "C:/Users/yudal/Documents/project/WntEvolution/XXXX/pep/outputUniquePep/all.pep.with.longest.eachGene.fa"
+R4eGPS::fastadumper_partialMatch(fastaPath,entries = c("ENSG00000163251"), outPath = "FZD_human_homo.fasta")
+
 ##########################
 nwk_tree_path <- "C:/Users/yudal/.egps2/config/bioData/example/9_model_species_evolution.nwk"
-R4eGPS::evoltre_getNodeNames(tree_path = nwk_tree_path, onlyLeaf = T)
-
-
-
-
-
-
-
-
-
-
-
-
+R4eGPS::evoltre_getNodeNames(tree_path = nwk_tree_path, getOTU = T, getHTU = T)
+R4eGPS::evoltre_getNodeNames(tree_path = nwk_tree_path, targetHTU = 'Root' , getOTU = F, getHTU = T)
+# Note: it will throw error, because no 'Root' name in HTU
 
 
 
@@ -71,13 +88,6 @@ R4eGPS::structDraw_multi_genes(list1)
 
 
 
-
-
-
-
-
-
-
 list2 <- list(
   gene1 = list(
     length = 100,
@@ -92,6 +102,18 @@ list2 <- list(
     color = c("#2A9D8F", "#F4A261")
   )
 )
+
+
+##########################################
+
+path_rankedLin <- "C:/Users/yudal/Documents/XXXX/new_taxdump_2025-01-01/rankedlineage.dmp"
+
+taxonomy_getRankedLineages(path_rankedLin, c(9606, 10096))
+
+
+
+
+
 
 
 

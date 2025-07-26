@@ -2,7 +2,7 @@
 % Please edit documentation in R/Class_Java_interaction.R
 \name{setLib_and_launchJVM}
 \alias{setLib_and_launchJVM}
-\title{Set libray and launch JVM}
+\title{Set library and launch JVM}
 \usage{
 setLib_and_launchJVM()
 }
@@ -10,7 +10,7 @@ setLib_and_launchJVM()
 the lib paths
 }
 \description{
-Set libray and launch JVM
+Set library and launch JVM
 }
 \examples{
 setLib_and_launchJVM()

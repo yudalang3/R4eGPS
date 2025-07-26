@@ -41,7 +41,7 @@ structDraw_multi_genes <- function(list,
   jsonStr <- jsonlite::toJSON(list)
   stringJavaObject <- rJava::.jnew("java/lang/String", jsonStr)
 
-  launchClass <- "egps2.module.structdraw.API4R"
+  launchClass <- "primary.struct.display.API4R"
   tryCatch(
     expr = {
       instance <- rJava::.jnew(launchClass)
