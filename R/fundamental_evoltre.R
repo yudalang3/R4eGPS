@@ -21,23 +21,25 @@ evoltre_getNodeNames <- function(tree_path, targetHTU = NULL , getOTU = TRUE, ge
     rlang::abort('Please input the tree_path argument.')
   }
 
-  initializeJVM4eGPS();
-  launchClass <- "module.evoltre.rinterface.API4R"
+  initializeJVM4eGPS()
+  launchClass <- "api.rpython.API4R"
   if (is.null(targetHTU)) {
     targetHTU <- rJava::.jnull("java.lang.String") # 显式传递 Java 的 null
   }
-  tryCatch(
+  javaResult <- tryCatch(
     expr = {
       instance <- rJava::.jnew(launchClass)
-      javaResult <- rJava::.jcall(instance,
-                                  "[Ljava/lang/String;",
-                                  "getNodeNames",
-                                  tree_path,
-                                  targetHTU,
-                                  getOTU,
-                                  getHTU)
+      rJava::.jcall(instance,
+                    "[Ljava/lang/String;",
+                    "extractNodeNames",
+                    .normalizePathForJava(tree_path, mustWork = FALSE),
+                    targetHTU,
+                    getOTU,
+                    getHTU)
     },
-    error = getErrorFun()
+    error = function(e) {
+      rlang::abort(conditionMessage(e))
+    }
   )
   return(javaResult)
 }

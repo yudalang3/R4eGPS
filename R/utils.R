@@ -37,13 +37,7 @@ writeDataFrameToTsv <- function(df, path) {
 #' @return nothing, error will throw if the command not meet.
 #'
 initializeJVM4eGPS <- function() {
-  if (!rJava::.jvmState()$initialized) {
-    if (checkJarLibAvaliable()) {
-      setLib_and_launchJVM()
-    }else {
-      rlang::abort("Sorry, please confige the eGPS first.")
-    }
-  }
+  setLib_and_launchJVM()
 }
 
 #' Run for a test.
@@ -52,10 +46,14 @@ initializeJVM4eGPS <- function() {
 #' @export
 #'
 runTest <- function() {
-  initializeJVM4eGPS();
-  launchClass <- "module.fastadumper.extractpartial.API4R"
-  instance <- rJava::.jnew(launchClass)
-  rJava::.jcall(instance, "V", "test4type",letters, 1:10)
+  initializeJVM4eGPS()
+  rJava::.jcall(
+    "api.rpython.TestJFrame",
+    "[B",
+    "renderDemoImageAsPng",
+    as.integer(160),
+    as.integer(120)
+  )
 }
 
 
