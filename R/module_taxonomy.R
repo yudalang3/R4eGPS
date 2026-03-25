@@ -27,9 +27,9 @@ taxonomy_getRankedLineages <- function(filePath,
       "[S",
       "getRankedLineages",
       filePath,
-      .jarray(entries)
+      rJava::.jarray(entries)
     )
-  }, error = getErrorFun())
+  }, error = function(e) rlang::abort(conditionMessage(e)))
 
 
   # 使用 strsplit 分割字符串

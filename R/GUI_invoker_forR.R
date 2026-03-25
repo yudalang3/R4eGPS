@@ -49,7 +49,7 @@ correlationVis_expressionProfile <- function(egps,
     expr = {
       rJava::.jcall(egps, "V", "correlationVis", temp.out, jsonStr)
     },
-    error = getErrorFun(),
+    error = function(e) rlang::abort(conditionMessage(e)),
     finally = {
       # on.exit(unlink(temp.out))
       # Java programe will delete the file

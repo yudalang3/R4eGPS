@@ -1,0 +1,10 @@
+# Normalize line endings to LF
+* text eol=lf
+
+# Binary files
+*.jar binary
+*.exe binary
+*.dll binary
+*.gif binary
+*.png binary
+*.rds binary

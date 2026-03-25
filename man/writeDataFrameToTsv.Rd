@@ -2,8 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{writeDataFrameToTsv}
 \alias{writeDataFrameToTsv}
-\title{Function as its name.
-how to use: writeDataFrameToTsv(data.frame(), "/output/path")}
+\title{Write a data.frame to a tab-separated file.}
 \usage{
 writeDataFrameToTsv(df, path)
 }
@@ -16,5 +15,5 @@ writeDataFrameToTsv(df, path)
 nothing
 }
 \description{
-importFrom("utils", "write.table")
+Write a data.frame to a tab-separated file.
 }

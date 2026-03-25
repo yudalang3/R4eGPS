@@ -6,10 +6,10 @@
 #'
 list2jsonStr <- function(ll) {
   if (is.null(ll)) {
-    stop("Please input values for parameter ll.");
+    rlang::abort("Please input values for parameter ll.")
   }
   if (!is.list(ll)) {
-    stop("Parameter ll must be a list.");
+    rlang::abort("Parameter ll must be a list.")
   }
 
   jsonStr <- jsonlite::toJSON(ll, dataframe = 'columns')
@@ -18,14 +18,13 @@ list2jsonStr <- function(ll) {
 
 
 
-#' Function as its name.
-#' how to use: writeDataFrameToTsv(data.frame(), "/output/path")
+#' Write a data.frame to a tab-separated file.
 #'
-#' importFrom("utils", "write.table")
 #' @param df the data.frame
 #' @param path the output path
 #'
 #' @return nothing
+#' @importFrom utils write.table
 #'
 writeDataFrameToTsv <- function(df, path) {
   write.table(df, file = path, quote = F, row.names = F, sep = "\t")
@@ -57,12 +56,30 @@ runTest <- function() {
 }
 
 
-#' get the error fun for catch error.
+#' Normalize a file path for Java compatibility.
 #'
-getErrorFun <- function() {
-  error = function(e) {
-    message("Running error:\nLets look at the condition object:")
-    str(e)
+#' @param path the file path to normalize
+#' @param mustWork logical, should the path exist?
+#'
+#' @return the normalized path with forward slashes
+#' @keywords internal
+.normalizePathForJava <- function(path, mustWork = TRUE) {
+  normalizePath(path, winslash = "/", mustWork = mustWork)
+}
+
+
+#' Coerce stored vars to a list.
+#'
+#' @param vars the stored vars (list or environment)
+#'
+#' @return the vars coerced to a list, or NULL
+#' @keywords internal
+.coerceStoredVars <- function(vars) {
+  if (is.null(vars)) {
+    return(NULL)
   }
-  return(error)
+  if (is.environment(vars)) {
+    return(as.list(vars, all.names = TRUE))
+  }
+  as.list(vars)
 }

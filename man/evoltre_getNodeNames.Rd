@@ -4,15 +4,10 @@
 \alias{evoltre_getNodeNames}
 \title{With importing the tree_path and the onlyLeaf parameters, return the names array.}
 \usage{
-evoltre_getNodeNames(
-  tree_path,
-  targetHTU = NULL,
-  getOTU = TRUE,
-  getHTU = FALSE
-)
+evoltre_getNodeNames(treePath, targetHTU = NULL, getOTU = TRUE, getHTU = FALSE)
 }
 \arguments{
-\item{tree_path}{The phylogenetic tree path}
+\item{treePath}{The phylogenetic tree path}
 
 \item{targetHTU}{NULL for the root node, else input the internal node name}
 

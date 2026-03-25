@@ -19,6 +19,6 @@ hmmer_domtbl2tsv <- function(hmmerDomtbl, outputPath) {
       instance <- rJava::.jnew(launchClass)
       rJava::.jcall(instance, "V", "domtbl_output_to_tsv", hmmerDomtbl , outputPath)
     },
-    error = getErrorFun()
+    error = function(e) rlang::abort(conditionMessage(e))
   )
 }

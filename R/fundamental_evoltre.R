@@ -1,6 +1,6 @@
 #' With importing the tree_path and the onlyLeaf parameters, return the names array.
 #'
-#' @param tree_path The phylogenetic tree path
+#' @param treePath The phylogenetic tree path
 #' @param targetHTU NULL for the root node, else input the internal node name
 #' @param getOTU whether get the OTU names
 #' @param getHTU whether get the HTU names
@@ -16,9 +16,9 @@
 #' evoltre_getNodeNames('path/to/tree.nwk' , targetHTU = 'name1', getOTU = T, getHTU = F);
 #' }
 #'
-evoltre_getNodeNames <- function(tree_path, targetHTU = NULL , getOTU = TRUE, getHTU = FALSE) {
-  if (rlang::is_missing(tree_path)) {
-    rlang::abort('Please input the tree_path argument.')
+evoltre_getNodeNames <- function(treePath, targetHTU = NULL, getOTU = TRUE, getHTU = FALSE) {
+  if (rlang::is_missing(treePath)) {
+    rlang::abort('Please input the treePath argument.')
   }
 
   initializeJVM4eGPS()
@@ -32,7 +32,7 @@ evoltre_getNodeNames <- function(tree_path, targetHTU = NULL , getOTU = TRUE, ge
       rJava::.jcall(instance,
                     "[Ljava/lang/String;",
                     "extractNodeNames",
-                    .normalizePathForJava(tree_path, mustWork = FALSE),
+                    .normalizePathForJava(treePath, mustWork = FALSE),
                     targetHTU,
                     getOTU,
                     getHTU)

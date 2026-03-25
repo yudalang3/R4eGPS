@@ -14,7 +14,9 @@ setGlobalVars(varList)
 no return
 }
 \description{
-'eGPS_software_path': the eGPS jars lib path, for example: "C:/Users/yudal/Documents/project/eGPS2/eGPS_v2_windows_64bit/eGPS_lib"
+'egps_repo_root': the persisted eGPS runtime root, usually the installation root
+'java_path': optional path to java or jvm.dll, defaulting to the bundled JRE when available
+'eGPS_software_path': legacy key retained for backward compatibility
 }
 \examples{
 \dontrun{

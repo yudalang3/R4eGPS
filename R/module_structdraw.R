@@ -4,7 +4,7 @@
 
 #' Draw the multi genes struct
 #'
-#' @param list list of the ploted views
+#' @param geneList list of the plotted views
 #' @param width the width of the displayed form view
 #' @param height the height of the displayed form view
 #' @param gHeight the height of each gene
@@ -25,12 +25,12 @@
 #' )
 #' R4eGPS::structDraw_multi_genes(list1)
 #' }
-structDraw_multi_genes <- function(list,
+structDraw_multi_genes <- function(geneList,
                                    width = 800,
                                    height = 500,
                                    gHeight = 50) {
-  if (rlang::is_missing(list)) {
-    rlang::abort('Please input the list argument.')
+  if (rlang::is_missing(geneList)) {
+    rlang::abort('Please input the geneList argument.')
   }
 
   initializeJVM4eGPS()
@@ -38,7 +38,7 @@ structDraw_multi_genes <- function(list,
   height <- as.integer(height)
   gHeight <- as.integer(gHeight)
 
-  jsonStr <- jsonlite::toJSON(list)
+  jsonStr <- jsonlite::toJSON(geneList)
   stringJavaObject <- rJava::.jnew("java/lang/String", jsonStr)
 
   launchClass <- "primary.struct.display.API4R"
@@ -53,6 +53,6 @@ structDraw_multi_genes <- function(list,
                     height,
                     gHeight)
     },
-    error = getErrorFun()
+    error = function(e) rlang::abort(conditionMessage(e))
   )
 }

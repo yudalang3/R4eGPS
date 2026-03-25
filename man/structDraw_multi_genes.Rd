@@ -4,10 +4,10 @@
 \alias{structDraw_multi_genes}
 \title{Draw the multi genes struct}
 \usage{
-structDraw_multi_genes(list, width = 800, height = 500, gHeight = 50)
+structDraw_multi_genes(geneList, width = 800, height = 500, gHeight = 50)
 }
 \arguments{
-\item{list}{list of the ploted views}
+\item{geneList}{list of the plotted views}
 
 \item{width}{the width of the displayed form view}
 

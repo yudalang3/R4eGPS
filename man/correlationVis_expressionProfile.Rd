@@ -32,7 +32,7 @@ Correlation Visualization with the expression profile
 \examples{
 \dontrun{
 
-egps <- launchEGPS_withinR(autoSetWD = T)
+egps <- launchEGPS_withinR()
 
 compsLength <- 10
 sampleSize <- 8

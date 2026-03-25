@@ -11,13 +11,14 @@ eGPS_software_path_key <- 'eGPS_software_path'
 #' @param libname the lib name
 #' @param pkgname the package name
 .onLoad <- function(libname, pkgname) {
+  maxHeap <- getOption("R4eGPS.max_heap", Sys.getenv("R4EGPS_MAX_HEAP", "4g"))
   options(
     java.parameters = unique(c(
       getOption("java.parameters", character()),
       "-Dfile.encoding=UTF-8",
       "-Dstdout.encoding=UTF-8",
-      "-Dstderr.encoding=UTF-8" ,
-      "-Xmx4g"
+      "-Dstderr.encoding=UTF-8",
+      paste0("-Xmx", maxHeap)
     ))
   )
 }
@@ -34,6 +35,7 @@ eGPS_software_path_key <- 'eGPS_software_path'
 #'
 #' @return no return
 #' @export
+#' @importFrom utils modifyList
 #'
 #' @examples
 #' \dontrun{
@@ -47,12 +49,20 @@ setGlobalVars <- function(varList) {
     rlang::abort(message = "Please input validate variable.")
   }
 
-  storedVars <- as.list(varList)
-  var_names <- names(storedVars)
+  newVars <- as.list(varList)
+  var_names <- names(newVars)
   if (is.null(var_names) || any(!nzchar(var_names))) {
     rlang::abort(message = "Please read the help of this function.")
   }
-  saveRDS(storedVars, file = storage_file_path)
+
+  existingVars <- if (file.exists(storage_file_path)) {
+    as.list(readRDS(storage_file_path))
+  } else {
+    list()
+  }
+
+  mergedVars <- modifyList(existingVars, newVars)
+  saveRDS(mergedVars, file = storage_file_path)
 }
 
 #' Get the global values.

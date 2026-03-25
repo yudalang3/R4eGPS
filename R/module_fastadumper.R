@@ -32,11 +32,11 @@ fastadumper_partialMatch <- function(fastaPath,
       "[S",
       "fastadumper_partialMatch",
       fastaPath,
-      .jarray(entries),
+      rJava::.jarray(entries),
       outPath,
       keepSearch
     )
     message(paste(ret,"\n"))
-  }, error = getErrorFun())
+  }, error = function(e) rlang::abort(conditionMessage(e)))
 
 }
