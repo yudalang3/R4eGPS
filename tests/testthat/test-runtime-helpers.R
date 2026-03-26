@@ -2,87 +2,133 @@
 # These tests verify runtime layout resolution, config file persistence,
 # JVM argument parsing, and VOICE configuration generation.
 
-repoRoot <- normalizePath(file.path(getwd(), ".."), winslash = "/", mustWork = TRUE)
-r4eGPSRoot <- file.path(repoRoot, "R4eGPS")
-bundleRoot <- normalizePath(
-  file.path(repoRoot, "..", "..", "eGPS_v2.1_windows_x64_selfTest"),
-  winslash = "/", mustWork = TRUE
-)
-bundleDependencyDir <- file.path(bundleRoot, "dependency-egps")
+.namespaceEnv <- asNamespace("R4eGPS")
 
-source(file.path(r4eGPSRoot, "R", "zzz.R"))
-source(file.path(r4eGPSRoot, "R", "utils.R"))
-source(file.path(r4eGPSRoot, "R", "runtime_resolver.R"))
-source(file.path(r4eGPSRoot, "R", "jvm_lifecycle.R"))
-source(file.path(r4eGPSRoot, "R", "voice_config.R"))
+
+.assignNamespaceValue <- function(name, value) {
+  unlockBinding(name, .namespaceEnv)
+  assign(name, value, .namespaceEnv)
+  lockBinding(name, .namespaceEnv)
+}
+
+
+.findBundleRuntimeForTests <- function() {
+  envCandidate <- Sys.getenv("EGPS_BUNDLE_ROOT", "")
+  candidates <- character()
+  if (nzchar(envCandidate)) {
+    candidates <- c(candidates, envCandidate)
+  }
+
+  current <- normalizePath(getwd(), winslash = "/", mustWork = TRUE)
+  repeat {
+    candidates <- c(
+      candidates,
+      file.path(current, "eGPS_v2.1_windows_x64_selfTest"),
+      file.path(current, "dependency-egps")
+    )
+    parent <- dirname(current)
+    if (identical(parent, current)) {
+      break
+    }
+    current <- parent
+  }
+
+  for (candidate in unique(candidates)) {
+    layout <- tryCatch(
+      R4eGPS:::.resolveRuntimeLayout(candidate, quiet = TRUE),
+      error = function(...) NULL
+    )
+    if (!is.null(layout) && identical(layout$kind, "bundle")) {
+      return(layout)
+    }
+  }
+
+  NULL
+}
+
+
+.bundleRuntime <- .findBundleRuntimeForTests()
+
+
+.skipIfBundleUnavailable <- function() {
+  if (is.null(.bundleRuntime)) {
+    testthat::skip("Bundle runtime not available for wrapper integration tests.")
+  }
+}
 
 
 test_that("configureEGPSSourceRuntime works and checkJarLibAvailable returns TRUE", {
-  configureEGPSSourceRuntime(repoRoot)
-  expect_true(checkJarLibAvailable())
+  .skipIfBundleUnavailable()
+  configureEGPSSourceRuntime(file.path(.bundleRuntime$root, "dependency-egps"))
+  expect_true(R4eGPS:::checkJarLibAvailable())
 })
 
 
 test_that("bundle layout is resolved from dependency-egps directory", {
-  bundleLayout <- .resolveRuntimeLayout(bundleDependencyDir)
+  .skipIfBundleUnavailable()
+  bundleDependencyDir <- file.path(.bundleRuntime$root, "dependency-egps")
+  bundleLayout <- R4eGPS:::.resolveRuntimeLayout(bundleDependencyDir)
   expect_identical(bundleLayout$kind, "bundle")
-  expect_identical(bundleLayout$root, bundleRoot)
-  expect_identical(bundleLayout$argsPath, file.path(bundleRoot, "eGPS2.args"))
+  expect_identical(bundleLayout$root, .bundleRuntime$root)
+  expect_identical(bundleLayout$argsPath, file.path(.bundleRuntime$root, "eGPS2.args"))
   expect_identical(
     bundleLayout$bundledJvmPath,
-    file.path(bundleRoot, "jre", "bin", "server", "jvm.dll")
+    file.path(.bundleRuntime$root, "jre", "bin", "server", "jvm.dll")
   )
   expect_true(any(grepl("egps-shell-0.0.1.jar$", bundleLayout$classPathEntries)))
 })
 
 
 test_that("interactive prompt resolves to bundle and persists vars", {
-  originalStoragePath <- storage_file_path
-  originalPromptForRuntimeRoot <- .promptForRuntimeRoot
-  originalDiscoverRepoRoot <- .discoverRepoRoot
+  .skipIfBundleUnavailable()
+  originalStoragePath <- get("storage_file_path", .namespaceEnv)
+  originalPromptForRuntimeRoot <- R4eGPS:::.promptForRuntimeRoot
+  originalDiscoverRepoRoot <- R4eGPS:::.discoverRepoRoot
   testStoragePath <- tempfile(fileext = ".rds")
+  bundleDependencyDir <- file.path(.bundleRuntime$root, "dependency-egps")
 
   on.exit({
-    storage_file_path <<- originalStoragePath
-    .promptForRuntimeRoot <<- originalPromptForRuntimeRoot
-    .discoverRepoRoot <<- originalDiscoverRepoRoot
+    .assignNamespaceValue("storage_file_path", originalStoragePath)
+    .assignNamespaceValue(".promptForRuntimeRoot", originalPromptForRuntimeRoot)
+    .assignNamespaceValue(".discoverRepoRoot", originalDiscoverRepoRoot)
     if (file.exists(testStoragePath)) file.remove(testStoragePath)
   })
 
-  storage_file_path <<- testStoragePath
-  .promptForRuntimeRoot <<- function() bundleDependencyDir
-  .discoverRepoRoot <<- function() NA_character_
+  .assignNamespaceValue("storage_file_path", testStoragePath)
+  .assignNamespaceValue(".promptForRuntimeRoot", function() bundleDependencyDir)
+  .assignNamespaceValue(".discoverRepoRoot", function() NA_character_)
 
-  promptedLayout <- .resolveRuntimeLayout(quiet = FALSE)
+  promptedLayout <- R4eGPS:::.resolveRuntimeLayout(quiet = FALSE)
   promptedVars <- getGlobalVars()
 
   expect_identical(promptedLayout$kind, "bundle")
-  expect_identical(promptedLayout$root, bundleRoot)
-  expect_identical(promptedVars[[egps_repo_root_key]], bundleRoot)
+  expect_identical(promptedLayout$root, .bundleRuntime$root)
+  expect_identical(promptedVars[[R4eGPS:::egps_repo_root_key]], .bundleRuntime$root)
   expect_identical(
-    promptedVars[[java_path_key]],
-    file.path(bundleRoot, "jre", "bin", "server", "jvm.dll")
+    promptedVars[[R4eGPS:::java_path_key]],
+    file.path(.bundleRuntime$root, "jre", "bin", "server", "jvm.dll")
   )
 })
 
 
 test_that("JVM arguments are parsed correctly from eGPS.args", {
-  javaArgs <- .parseEGPSArgs(repoRoot)
+  .skipIfBundleUnavailable()
+  javaArgs <- R4eGPS:::.parseEGPSArgs(.bundleRuntime$root)
   expect_true("--add-opens=java.desktop/java.awt=ALL-UNNAMED" %in% javaArgs)
   expect_true("-Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize" %in% javaArgs)
 })
 
 
 test_that("classpath entries contain expected paths", {
-  classPathEntries <- .getRuntimeClassPathEntries(repoRoot)
-  expect_true(any(grepl("egps-main\\.gui/out/production/egps-main\\.gui$", classPathEntries)))
-  expect_true(any(grepl("egps-pathway\\.evol\\.browser/out/production/egps-pathway\\.evol\\.browser$", classPathEntries)))
+  .skipIfBundleUnavailable()
+  classPathEntries <- R4eGPS:::.getRuntimeClassPathEntries(.bundleRuntime$root)
+  expect_true(any(grepl("egps-shell-0\\.0\\.1\\.jar$", classPathEntries)))
   expect_true(any(grepl("\\.jar$", classPathEntries)))
 })
 
 
 test_that("Modern Tree View config file is generated correctly", {
-  modernTreeConfigPath <- .createModernTreeViewConfigFile(
+  modernTreeConfigPath <- R4eGPS:::.createModernTreeViewConfigFile(
     newickText = "(A:1,B:1);",
     layout = "CIRCULAR",
     leafLabel = FALSE,
@@ -111,7 +157,7 @@ test_that("Pathway Family Browser config file is generated correctly", {
   gallery1 <- normalizePath(gallery1, winslash = "/", mustWork = TRUE)
   gallery2 <- normalizePath(gallery2, winslash = "/", mustWork = TRUE)
 
-  pathwayConfigPath <- .createPathwayFamilyBrowserConfigFile(
+  pathwayConfigPath <- R4eGPS:::.createPathwayFamilyBrowserConfigFile(
     treePath = treePath,
     componentCounts = data.frame(Name = "sp1", WNT3A = 2),
     speciesInfo = data.frame(Name = "sp1", Clade = "A"),
@@ -135,4 +181,16 @@ test_that("Pathway Family Browser config file is generated correctly", {
   expect_true("$tree.title.string=Pathway browser" %in% pathwayConfig)
   expect_true("$tree.need.reverse.axis=F" %in% pathwayConfig)
   expect_true("$layout.blank.space=10,20,30,40" %in% pathwayConfig)
+})
+
+
+test_that("evoltre_getNodeNames accepts the legacy tree_path argument name", {
+  .skipIfBundleUnavailable()
+  configureEGPSSourceRuntime(file.path(.bundleRuntime$root, "dependency-egps"))
+
+  treePath <- tempfile(fileext = ".nwk")
+  writeLines("(A:1,B:1);", treePath, useBytes = TRUE)
+
+  nodeNames <- evoltre_getNodeNames(tree_path = treePath, getOTU = TRUE, getHTU = FALSE)
+  expect_identical(nodeNames, c("A", "B"))
 })
